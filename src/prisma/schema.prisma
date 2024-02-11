@@ -1,0 +1,165 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int                @id @default(autoincrement())
+  name             String
+  username         String
+  password         String
+  email            String?            @unique
+  address          String
+  phone            String
+  birthdate        DateTime
+  Restaurant_User  Restaurant_User[]
+  Order            Order[]
+  Restaurant_Order Restaurant_Order[]
+  User_Search      User_Search[]
+  Cart             Cart[]
+
+  @@map("user")
+}
+
+model User_Search {
+  id     Int    @id @default(autoincrement())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId Int    @map("user_id")
+  name   String
+
+  @@map("user_search")
+}
+
+model Restaurant_User {
+  id           Int        @id @default(autoincrement())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  restaurantId Int        @map("restaurant_id")
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId       Int        @map("user_id")
+
+  @@map("restaurant_user")
+}
+
+model Restaurant {
+  id               Int                @id @default(autoincrement())
+  name             String
+  address          String
+  phone            String
+  type             RestaurantType
+  Restaurant_User  Restaurant_User[]
+  Menu             Menu[]
+  Restaurant_Order Restaurant_Order[]
+
+  @@map("Restaurants")
+}
+
+enum RestaurantType {
+  THAI
+  JAPANESE
+  ITALIAN
+  CHINESE
+  KOREAN
+}
+
+model Menu_Order {
+  id      Int   @id @default(autoincrement())
+  menu    Menu  @relation(fields: [menuId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  menuId  Int   @map("menu_id")
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orderId Int   @map("order_id")
+
+  @@map("menu_order")
+}
+
+model Menu {
+  id           Int          @id @default(autoincrement())
+  category     Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  categoryId   Int          @map("category_id")
+  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  restaurantId Int          @map("restaurant_id")
+  product      String
+  price        Decimal
+  Menu_Img     Menu_Img?    @relation(fields: [menu_ImgId], references: [id])
+  menu_ImgId   Int?
+  Menu_Order   Menu_Order[]
+
+  @@map("menus")
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String
+  Menu Menu[]
+
+  @@map("category")
+}
+
+model Menu_Img {
+  id   Int    @id @default(autoincrement())
+  url  String
+  Menu Menu[]
+
+  @@map("menu_img")
+}
+
+model Restaurant_Order {
+  id           Int        @id @default(autoincrement())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  restaurantId Int        @map("restaurant_id")
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId       Int        @map("user_id")
+
+  @@map("restaurant_order")
+}
+
+model Cart {
+  id      Int   @id @default(autoincrement())
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId  Int   @map("user_id")
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orderId Int   @map("order_id")
+
+  @@map("cart")
+}
+
+model Order {
+  id              Int            @id @default(autoincrement())
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId          Int            @map("user_id")
+  status          String
+  datetime        DateTime
+  deliveryAddress String
+  paymentMethod   String
+  paymentAmount   Decimal
+  paymentDatetime DateTime
+  Payment         Payment[]
+  Order_Detail    Order_Detail[]
+  Menu_Order      Menu_Order[]
+  Cart            Cart[]
+
+  @@map("order")
+}
+
+model Order_Detail {
+  id      Int     @id @default(autoincrement())
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orderId Int     @map("order_id")
+  notes   String?
+
+  @@map("order_detail")
+}
+
+model Payment {
+  id      Int    @id @default(autoincrement())
+  url     String
+  Order   Order? @relation(fields: [orderId], references: [id])
+  orderId Int?
+
+  @@map("payment")
+}
