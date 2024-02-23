@@ -10,14 +10,16 @@ datasource db {
 }
 
 model User {
-  id               Int                @id @default(autoincrement())
-  name             String
-  username         String
-  password         String
-  email            String?            @unique
-  address          String
-  phone            String
-  birthdate        DateTime
+  id        Int      @id @default(autoincrement())
+  name      String
+  role      Role     @default(USER)
+  username  String
+  password  String
+  email     String?  @unique
+  address   String
+  phone     String
+  birthdate DateTime
+
   Restaurant_User  Restaurant_User[]
   Order            Order[]
   Restaurant_Order Restaurant_Order[]
@@ -25,6 +27,12 @@ model User {
   Cart             Cart[]
 
   @@map("user")
+}
+
+enum Role {
+  USER
+  TEADER
+  ADMIN
 }
 
 model User_Search {
