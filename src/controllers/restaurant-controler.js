@@ -111,7 +111,7 @@ exports.delRestaurant = async (req, res, next) => {
       where: {
         id: Number(id)
       }
-    });
+    }); 
     
     if (!restaurant) {
       throw new Error('Restaurant not found');
@@ -122,4 +122,4 @@ exports.delRestaurant = async (req, res, next) => {
     next(err);
   }
 };
-
+//
