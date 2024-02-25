@@ -59,7 +59,7 @@ model Restaurant {
   name             String
   address          String
   phone            String
-  type             RestaurantType
+  type             String
   Restaurant_User  Restaurant_User[]
   Menu             Menu[]
   Restaurant_Order Restaurant_Order[]
@@ -67,13 +67,6 @@ model Restaurant {
   @@map("Restaurants")
 }
 
-enum RestaurantType {
-  THAI
-  JAPANESE
-  ITALIAN
-  CHINESE
-  KOREAN
-}
 
 model Menu_Order {
   id      Int   @id @default(autoincrement())
@@ -87,15 +80,15 @@ model Menu_Order {
 
 model Menu {
   id           Int          @id @default(autoincrement())
+  name         String
+  price        Decimal      @db.Decimal(10, 2)
+  menuImg      Menu_Img?    @relation(fields: [menuImgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  menuImgId    Int?         @map("menu_img_id")
+  Menu_Order   Menu_Order[]
   category     Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   categoryId   Int          @map("category_id")
   restaurant   Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   restaurantId Int          @map("restaurant_id")
-  product      String
-  price        Decimal
-  Menu_Img     Menu_Img?    @relation(fields: [menu_ImgId], references: [id])
-  menu_ImgId   Int?
-  Menu_Order   Menu_Order[]
 
   @@map("menus")
 }

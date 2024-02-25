@@ -1,4 +1,5 @@
 const db = require("../models/db");
+
 //create
 exports.createRestaurant = async (req, res, next) => {
   const { name, address, phone, type } = req.body;
@@ -7,7 +8,8 @@ exports.createRestaurant = async (req, res, next) => {
     if (!(name && address && phone && type)) {
       throw new Error('Check the information to be correct.')
     }
-
+  
+ 
     const restaurantData = {
       name,
       address,
@@ -15,9 +17,9 @@ exports.createRestaurant = async (req, res, next) => {
       type
     };
 
-    const newRestaurant = await db.Restaurant.create({ data: restaurantData });
-    console.log(newRestaurant)
-    res.json({ msg: 'restaurant successful' })
+    const newRestaurant = await db.restaurant.create({ data: restaurantData });
+
+    res.json({newRestaurant, msg: 'restaurant successful' })
   } catch (err) {
 
     next(err);
@@ -98,7 +100,6 @@ exports.getRestaurantAll = async (req, res, next) => {
   }
 };
 
-
 //del
 exports.delRestaurant = async (req, res, next) => {
   const { id } = req.params;
@@ -121,3 +122,4 @@ exports.delRestaurant = async (req, res, next) => {
     next(err);
   }
 };
+

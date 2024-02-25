@@ -1,16 +1,34 @@
-const createError = require("../utils/createError");
+const jwt = require("jsonwebtoken");
+const db = require("../models/db");
 
-const admin = (req, res, next) => {
+module.exports = async (req, res, next) => {
     try {
-        
-        if (req.user.role !== "ADMIN") {
-            return createError(403, "Forbidden");
+        const authorization = req.headers.authorization;
+        if (!authorization) {
+            throw new Error("Unauthorized");
         }
-  
+        if (!(authorization.startsWith('Bearer'))) {
+            throw new Error("Unauthorized");
+        }
+        const token = authorization.split(' ')[1]; 
+        const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+        // ตรวจสอบ role 
+        const user = await db.user.findFirst({
+            where: {
+                id: payload.id,
+                role: "ADMIN" 
+            }
+        });
+
+        if (!user) {
+            throw new Error("แกไม่มีสิทธ์!");
+        }
+
+        req.user = user;
+
         next();
     } catch (err) {
         next(err);
     }
 };
-
-module.exports = admin;
