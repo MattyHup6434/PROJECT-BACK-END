@@ -62,7 +62,43 @@ exports.login = async (req, res, next) => {
     next(err)
   }
 };
+// getById
+exports.getUser = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    if (id === undefined || id === null) {
+      throw new Error('Missing ID for get');
+    }
+    const userId = Number(id);
+    const user = await db.user.findFirst({
+      where: {
+        id: userId
+      }
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    res.json(user);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// getAllUsers
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    const users = await db.user.findMany();
+    res.json(users);
+  } catch (err) {
+    next(err);
+  }
+};
+
+
 
 exports.getme = (req,res,next) => {
   res.json(req.user)
 }
+

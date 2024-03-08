@@ -93,7 +93,7 @@ exports.getRestaurantById = async (req, res, next) => {
 //getAll
 exports.getRestaurantAll = async (req, res, next) => {
   try {
-    const restaurants = await db.Restaurant.findMany();
+    const restaurants = await db.restaurant.findMany();
     res.json(restaurants);
   } catch (err) {
     next(err);

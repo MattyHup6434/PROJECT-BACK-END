@@ -10,23 +10,26 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  role      Role     @default(USER)
-  username  String
-  password  String
-  email     String?  @unique
-  address   String
-  phone     String
-  birthdate DateTime
-
-  Restaurant_User  Restaurant_User[]
-  Order            Order[]
-  Restaurant_Order Restaurant_Order[]
-  User_Search      User_Search[]
-  Cart             Cart[]
+  id          Int           @id @default(autoincrement())
+  name        String
+  role        Role          @default(USER)
+  username    String
+  password    String
+  email       String?       @unique
+  address     String
+  phone       String
+  birthdate   DateTime
+  User_Search User_Search[]
+  Order       Order[]
+  StatusUser  StatusUser?   @default(ONLINE)
+  Restaurant  Restaurant[]
 
   @@map("user")
+}
+
+enum StatusUser {
+  ONLINE
+  OFFLLINE
 }
 
 enum Role {
@@ -44,51 +47,35 @@ model User_Search {
   @@map("user_search")
 }
 
-model Restaurant_User {
-  id           Int        @id @default(autoincrement())
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  restaurantId Int        @map("restaurant_id")
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId       Int        @map("user_id")
-
-  @@map("restaurant_user")
-}
-
 model Restaurant {
-  id               Int                @id @default(autoincrement())
-  name             String
-  address          String
-  phone            String
-  type             String
-  Restaurant_User  Restaurant_User[]
-  Menu             Menu[]
-  Restaurant_Order Restaurant_Order[]
+  id      Int               @id @default(autoincrement())
+  name    String
+  address String
+  phone   String
+  type    String
+  status  StatusRestaurant?
+  Menu    Menu[]
+  user    User?              @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId  Int?              @map("user_id")
 
   @@map("Restaurants")
 }
 
-
-model Menu_Order {
-  id      Int   @id @default(autoincrement())
-  menu    Menu  @relation(fields: [menuId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  menuId  Int   @map("menu_id")
-  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  orderId Int   @map("order_id")
-
-  @@map("menu_order")
+enum StatusRestaurant {
+  OPEN
+  CLOSE
 }
 
 model Menu {
-  id           Int          @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   name         String
-  price        Decimal      @db.Decimal(10, 2)
-  menuImg      Menu_Img?    @relation(fields: [menuImgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  menuImgId    Int?         @map("menu_img_id")
-  Menu_Order   Menu_Order[]
-  category     Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  categoryId   Int          @map("category_id")
-  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  restaurantId Int          @map("restaurant_id")
+  price        Decimal    @db.Decimal(10, 2)
+  menuImg      Menu_Img?  @relation(fields: [menuImgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  menuImgId    Int?       @map("menu_img_id")
+  category     Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  categoryId   Int        @map("category_id")
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  restaurantId Int        @map("restaurant_id")
 
   @@map("menus")
 }
@@ -109,58 +96,26 @@ model Menu_Img {
   @@map("menu_img")
 }
 
-model Restaurant_Order {
-  id           Int        @id @default(autoincrement())
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  restaurantId Int        @map("restaurant_id")
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId       Int        @map("user_id")
-
-  @@map("restaurant_order")
-}
-
-model Cart {
-  id      Int   @id @default(autoincrement())
-  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId  Int   @map("user_id")
-  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  orderId Int   @map("order_id")
-
-  @@map("cart")
-}
-
 model Order {
-  id              Int            @id @default(autoincrement())
-  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId          Int            @map("user_id")
-  status          String
+  id              Int      @id @default(autoincrement())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId          Int      @map("user_id")
+  status          Status   @default(ODER_RECEIVED)
   datetime        DateTime
   deliveryAddress String
+  notes           String?
   paymentMethod   String
   paymentAmount   Decimal
   paymentDatetime DateTime
-  Payment         Payment[]
-  Order_Detail    Order_Detail[]
-  Menu_Order      Menu_Order[]
-  Cart            Cart[]
+  img_pay         String
 
   @@map("order")
 }
 
-model Order_Detail {
-  id      Int     @id @default(autoincrement())
-  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  orderId Int     @map("order_id")
-  notes   String?
-
-  @@map("order_detail")
-}
-
-model Payment {
-  id      Int    @id @default(autoincrement())
-  url     String
-  Order   Order? @relation(fields: [orderId], references: [id])
-  orderId Int?
-
-  @@map("payment")
+enum Status {
+  ODER_RECEIVED
+  PREPARING_FOOD
+  AWAITING_DELiVERY
+  OUT_FOR_DELIVERY
+  DELIVERED
 }

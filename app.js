@@ -5,6 +5,7 @@ const notFound = require("./src/middlewares/notFound");
 const errorMiddleware = require("./src/middlewares/error");
 const authRoute = require("./src/routes/auth-route");
 const adminRoute = require("./src/routes/admin-route");
+const userRoute = require("./src/routes/user-router");
 
 const app = express();
 
@@ -12,8 +13,10 @@ app.use(cors());
 app.use(express.json());
 
 // service
+
 app.use("/auth", authRoute);
 app.use("/admin", adminRoute);
+app.use("/user", userRoute);
 
 // notFound
 app.use(notFound);
